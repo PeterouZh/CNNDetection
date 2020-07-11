@@ -1,17 +1,19 @@
+import sys
 import torch
 import numpy as np
 from networks.resnet import resnet50
 from sklearn.metrics import average_precision_score, precision_recall_curve, accuracy_score
 from options.test_options import TestOptions
 from data import create_dataloader
+import tqdm
 
 
-def validate(model, opt):
+def validate(model, opt, stdout=sys.stdout):
     data_loader = create_dataloader(opt)
 
     with torch.no_grad():
         y_true, y_pred = [], []
-        for img, label in data_loader:
+        for img, label in tqdm.tqdm(data_loader, file=stdout):
             in_tens = img.cuda()
             y_pred.extend(model(in_tens).sigmoid().flatten().tolist())
             y_true.extend(label.flatten().tolist())
